@@ -49,9 +49,20 @@ class MjMxBridge:
                     jnt_adr+4, jnt_adr+5, jnt_adr+6, jnt_adr+3
                 ]
 
+    @property
+    def mj_model(self) -> mujoco.MjModel:
+        return self._mj_model
+    
+    @property
+    def mj_data(self) -> mujoco.MjData:
+        return self._mj_data
+
     def update(self, mx_data: "motrixsim.SceneData") -> mujoco.MjData:
-        assert mx_data.dof_pos.shape[0] == self._mj_model.nq, "DOF position size mismatch"
-        self._mj_data.qpos[self.map_qpos_idx_mjmx] = mx_data.dof_pos[:]
+        assert mx_data.dof_pos.shape[-1] == self._mj_model.nq, "DOF position size mismatch, {} vs {}".format(mx_data.dof_pos.shape[-1], self._mj_model.nq)
+        if len(mx_data.dof_pos.shape) == 2:
+            self._mj_data.qpos[self.map_qpos_idx_mjmx] = mx_data.dof_pos[0, :]
+        else:
+            self._mj_data.qpos[self.map_qpos_idx_mjmx] = mx_data.dof_pos[:]
         mujoco.mj_forward(self._mj_model, self._mj_data)
         return self._mj_data
 

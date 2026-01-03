@@ -37,6 +37,15 @@ try:
 except ImportError:
     print("[ERROR] mujoco_lidar package not found. Please install mujoco-lidar to run this example.")
     print("Visit https://github.com/TATP-233/MuJoCo-LiDAR for installation instructions.")
+
+    print("[ERROR] mujoco_lidar package not found. Please install mujoco-lidar[taichi] to run this example.")
+    print("Visit https://github.com/TATP-233/MuJoCo-LiDAR for installation instructions.")
+    print("\nInstallation steps:")
+    print("  git clone https://github.com/TATP-233/MuJoCo-LiDAR.git")
+    print("  cd MuJoCo-LiDAR")
+    print("  pip install -e \".[taichi]\"")
+    exit(0)
+
     exit(0)
 
 _Lidar = flags.DEFINE_string("lidartype", "mid360", "LiDAR type, Choices: [airy, mid360]")
@@ -51,7 +60,6 @@ def main(argv):
         livox_generator = scan_gen.LivoxGenerator(lidar_type)
         rays_theta, rays_phi = livox_generator.sample_ray_angles()
         dynamic_lidar = True
-    rays_theta, rays_phi = livox_generator.sample_ray_angles()
     rays_theta = np.ascontiguousarray(rays_theta).astype(np.float32)
     rays_phi = np.ascontiguousarray(rays_phi).astype(np.float32)
     
@@ -82,7 +90,7 @@ def main(argv):
 
         geomgroup = np.ones((mujoco.mjNGROUP,), dtype=np.ubyte)
         geomgroup[3:] = 0  # 排除group 1中的几何体
-        lidar = MjLidarWrapper(bridge._mj_model, site_name="lidar", backend="taichi", args={'bodyexclude': bridge._mj_model.body("base").id, "geomgroup":geomgroup})
+        lidar = MjLidarWrapper(bridge.mj_model, site_name="lidar", backend="taichi", args={'bodyexclude': bridge.mj_model.body("base").id, "geomgroup":geomgroup})
         world_points, colors = None, None
 
         render_cnt = 0
@@ -93,10 +101,10 @@ def main(argv):
             nonlocal render_cnt, lidar_render_substep
             nonlocal world_points, colors
             if render_cnt % lidar_render_substep == 0:
-                mj_data = bridge.update(policy.data)
+                bridge.update(policy.data)
                 if dynamic_lidar:
                     rays_theta, rays_phi = livox_generator.sample_ray_angles()
-                lidar.trace_rays(mj_data, rays_theta, rays_phi)
+                lidar.trace_rays(bridge.mj_data, rays_theta, rays_phi)
                 points = lidar.get_hit_points()
                 world_points = points @ lidar.sensor_rotation.T + lidar.sensor_position
 
