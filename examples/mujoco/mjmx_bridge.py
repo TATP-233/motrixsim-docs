@@ -75,6 +75,13 @@ class MjMxBridge:
     def load_keyframe(self, mx_data: "motrixsim.SceneData", mx_model: "motrixsim.SceneModel", keyframe_idx: Union[int, str]) -> None:
         mujoco.mj_resetData(self._mj_model, self._mj_data)
         mujoco.mj_resetDataKeyframe(self._mj_model, self._mj_data, self._mj_model.key(keyframe_idx).id)
-        mx_data.set_dof_pos(self._mj_data.qpos[self.map_qpos_idx_mjmx], mx_model)
-        mx_data.set_dof_vel(self._mj_data.qvel)
-        mx_data.actuator_ctrls = self._mj_data.ctrl.copy()
+        mujoco.mj_forward(self._mj_model, self._mj_data)
+        if len(mx_data.dof_pos.shape) == 2:
+            num_env = mx_data.dof_pos.shape[0]
+            mx_data.set_dof_pos(np.repeat(self._mj_data.qpos[self.map_qpos_idx_mjmx][np.newaxis, :], num_env, axis=0), mx_model)
+            mx_data.set_dof_vel(np.repeat(self._mj_data.qvel[np.newaxis, :], num_env, axis=0))
+            mx_data.actuator_ctrls = np.repeat(self._mj_data.ctrl[np.newaxis, :], num_env, axis=0)
+        else:
+            mx_data.set_dof_pos(self._mj_data.qpos[self.map_qpos_idx_mjmx], mx_model)
+            mx_data.set_dof_vel(self._mj_data.qvel)
+            mx_data.actuator_ctrls = self._mj_data.ctrl.copy()

@@ -18,7 +18,7 @@
 
   <worldbody>
     <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
-    <geom name="floor" pos="0 0 -1.89" size="1 1 1" type="hfield" hfield="hfield"/>
+    <geom group="2" name="floor" pos="0 0 -1.89" size="1 1 1" type="hfield" hfield="hfield"/>
     <site name="static_site" pos="6 2 0"/>
   </worldbody>
 

@@ -73,7 +73,7 @@ def main(argv):
     with RenderApp() as render:
         gizmos = render.gizmos
 
-        lidar_backend = "taichi"
+        lidar_backend = "jax"
         # The scene description file
         if _Stairs.value.lower() == "true":
             path = "examples/assets/go2/scene_stairs_terrain.xml"
