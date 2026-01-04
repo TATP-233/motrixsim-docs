@@ -34,6 +34,8 @@ from mujoco.mjmx_bridge import MjMxBridge
 try:
     from mujoco_lidar import scan_gen
     from mujoco_lidar import MjLidarWrapper
+    assert mujoco_lidar.__version__ >= "0.2.3", "Please upgrade mujoco-lidar to version 0.2.3 or higher."
+
 except ImportError:
     print("[ERROR] mujoco_lidar package not found. Please install mujoco-lidar to run this example.")
     print("Visit https://github.com/TATP-233/MuJoCo-LiDAR for installation instructions.")
@@ -49,6 +51,7 @@ except ImportError:
     exit(0)
 
 _Lidar = flags.DEFINE_string("lidartype", "mid360", "LiDAR type, Choices: [airy, mid360]")
+_Stairs = flags.DEFINE_string("stairs", "false", "Use stairs terrain, Choices: [true, false]")
 
 def main(argv):
     # Prepare the LiDAR scanner configuration
@@ -69,8 +72,13 @@ def main(argv):
     with RenderApp() as render:
         gizmos = render.gizmos
 
+        lidar_backend = "taichi"
         # The scene description file
-        path = "examples/assets/go2/scene_geom.xml"
+        if _Stairs.value.lower() == "true":
+            path = "examples/assets/go2/scene_stairs_terrain.xml"
+            lidar_backend = "jax"
+        else:
+            path = "examples/assets/go2/scene_geom.xml"
         # Load the scene model
         model = load_model(path)
 
@@ -90,7 +98,7 @@ def main(argv):
 
         geomgroup = np.ones((mujoco.mjNGROUP,), dtype=np.ubyte)
         geomgroup[3:] = 0  # 排除group 1中的几何体
-        lidar = MjLidarWrapper(bridge.mj_model, site_name="lidar", backend="taichi", args={'bodyexclude': bridge.mj_model.body("base").id, "geomgroup":geomgroup})
+        lidar = MjLidarWrapper(bridge.mj_model, site_name="lidar", backend=lidar_backend, args={'bodyexclude': bridge.mj_model.body("base").id, "geomgroup":geomgroup})
         world_points, colors = None, None
 
         render_cnt = 0

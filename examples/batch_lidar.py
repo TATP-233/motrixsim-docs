@@ -1,3 +1,4 @@
+import os
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,8 +12,13 @@ from mujoco.mjmx_bridge import MjMxBridge
 try:
     import jax
     import jax.numpy as jnp
+    os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = "0.3" # 如果显存充足，可以调大一些
+
+    import mujoco_lidar
     from mujoco_lidar import scan_gen
     from mujoco_lidar.core_jax import MjLidarJax
+    assert mujoco_lidar.__version__ >= "0.2.3", "Please upgrade mujoco-lidar to version 0.2.3 or higher."
+
 except ImportError:
     print("[ERROR] mujoco_lidar package not found. Please install mujoco-lidar[jax] to run this example.")
     print("Visit https://github.com/TATP-233/MuJoCo-LiDAR for installation instructions.")
@@ -38,6 +44,7 @@ _Lidar = flags.DEFINE_string("lidartype", "mid360", "LiDAR type, Choices: [airy,
 _VisPoints = flags.DEFINE_string("vispoints", "true", "Visualize points, Choices: [true, false]")
 _Profile = flags.DEFINE_string("profile", "false", "Enable profiling, Choices: [true, false]")
 _TestCount = flags.DEFINE_integer("testcount", 10, "Number of test iterations before exit")
+_Stairs = flags.DEFINE_string("stairs", "false", "Use stairs terrain, Choices: [true, false]")
 
 def main(argv):
     lidar_type = _Lidar.value
@@ -61,7 +68,10 @@ def main(argv):
     size = 2
     batch_size = size * size
 
-    path = "examples/assets/go2/scene_geom.xml"
+    if _Stairs.value.lower() == "true":
+        path = "examples/assets/go2/scene_stairs_terrain.xml"
+    else:
+        path = "examples/assets/go2/scene_geom.xml"
     model = load_model(path)
     data = SceneData(model, batch=(batch_size,))
     # a batch dimension is added to all data fields
