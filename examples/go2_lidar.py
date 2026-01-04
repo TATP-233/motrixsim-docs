@@ -32,6 +32,7 @@ from go2_keyboard_control import (
 from mujoco.mjmx_bridge import MjMxBridge
 
 try:
+    import mujoco_lidar
     from mujoco_lidar import scan_gen
     from mujoco_lidar import MjLidarWrapper
     assert mujoco_lidar.__version__ >= "0.2.3", "Please upgrade mujoco-lidar to version 0.2.3 or higher."
@@ -76,7 +77,6 @@ def main(argv):
         # The scene description file
         if _Stairs.value.lower() == "true":
             path = "examples/assets/go2/scene_stairs_terrain.xml"
-            lidar_backend = "jax"
         else:
             path = "examples/assets/go2/scene_geom.xml"
         # Load the scene model
