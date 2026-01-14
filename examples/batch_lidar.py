@@ -176,7 +176,7 @@ def main(argv):
     # When create scene data in batch mode, we also need to launch the render in batch mode.
     # The render offset can be assigned for each instance to avoid overlapping.
     # Note: The offset only affects the render objects, the physics instance is still at the origin.
-    grid_size = (25 * float(size < 3)) if _Stairs.value.lower() == "true" else 8
+    grid_size = (25 * float(size < 3)) if _Stairs.value.lower() == "true" else 25
     render_offset = []
     for i in range(size):
         for j in range(size):
