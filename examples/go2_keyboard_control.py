@@ -39,6 +39,8 @@ class OnnxController:
         # Create the physics data of the model
         self._data = SceneData(self._model)
 
+        self._model.keyframes[-1].apply(self._data)
+
         self._policy = ort.InferenceSession(policy_path, providers=["CPUExecutionProvider"])
         self._input_name = self._policy.get_inputs()[0].name
         self._output_name = self._policy.get_outputs()[0].name

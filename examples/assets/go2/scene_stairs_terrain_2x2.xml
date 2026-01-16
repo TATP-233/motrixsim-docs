@@ -1,7 +1,5 @@
-<mujoco model="go2 stairs terrain scene">
+<mujoco model="go2 feetonly flat terrain scene">
   <include file="go2_mjx.xml"/>
-
-  <statistic center="0 0 0.1" extent="0.8" meansize="0.04" />
 
   <visual>
     <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
@@ -13,30 +11,25 @@
   </visual>
 
   <asset>
-    <!-- <hfield name="hfield" file="assets/heightmap_stairs.png" size="22.5 22.5 3 4" /> -->
-    <hfield name="hfield" file="assets/heightmap_stairs_3x3.png" size="22.5 22.5 3 4" />
+    <hfield name="hfield" file="assets/heightmap_stairs_2x2.png" size="22.5 22.5 3 4" />
   </asset>
 
   <worldbody>
     <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
-    <geom group="2" name="floor" pos="0 0 -1.89" size="1 1 1" type="hfield" hfield="hfield"/>
+    <geom name="floor" pos="0 0 -1.89" size="1 1 1" type="hfield" hfield="hfield"/>
     <site name="static_site" pos="6 2 0"/>
   </worldbody>
 
   <keyframe>
     <key name="home"
       qpos="
-      7.47569 -0.507727 -0.119553
+      0 0 -0.12
       1 0 0 0
       0.1 0.9 -1.8
       -0.1 0.9 -1.8
       0.1 0.9 -1.8
       -0.1 0.9 -1.8"
       ctrl="0.1 0.9 -1.8 -0.1 0.9 -1.8 0.1 0.9 -1.8 -0.1 0.9 -1.8"/>
-    <key name="flat"
-      qpos="3.988 7.89636 -0.454235 0.999758 0.000481284 -0.02062 -0.00761517 0.154105 0.873907 -1.90901 -0.155124 0.873881 -1.90963 0.196506 0.865206 -1.95655 -0.195179 0.861012 -1.95949"
-      ctrl="0.1 0.9 -1.8 -0.1 0.9 -1.8 0.1 0.9 -1.8 -0.1 0.9 -1.8"
-    />
   </keyframe>
 
 </mujoco>

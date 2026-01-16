@@ -62,16 +62,27 @@ def main(argv):
         livox_generator = scan_gen.LivoxGenerator(lidar_type)
         rays_theta, rays_phi = livox_generator.sample_ray_angles(downsample=4)
         dynamic_lidar = True
+    elif lidar_type == "custom":
+        theta_steps: int = 360  # Horizontal resolution
+        phi_steps: int = 64     # Vertical resolution
+        phi_range_min: float = 0.0        # Vertical angle range min
+        phi_range_max: float = 1.5707963  # Vertical angle range max (pi/2)
+        rays_theta, rays_phi = scan_gen.generate_grid_scan_pattern(
+            theta_steps, phi_steps, phi_range=(phi_range_min, phi_range_max)
+        )
+
     rays_theta = np.ascontiguousarray(rays_theta).astype(np.float32)
     rays_phi = np.ascontiguousarray(rays_phi).astype(np.float32)
     num_rays = rays_theta.shape[0]
     cmap = plt.get_cmap('hsv')  # 或使用 'jet', 'viridis', 'plasma' 等
 
-    size = 2
+    size = 32
     batch_size = size * size
 
     if _Stairs.value.lower() == "true":
-        path = "examples/assets/go2/scene_stairs_terrain.xml"
+        # path = "examples/assets/go2/scene_stairs_geom_15cm.xml" # 4090 50m p fps
+        # path = "examples/assets/go2/scene_stairs_terrain.xml"
+        path = "examples/assets/go2/scene_stairs_geom.xml"
     else:
         path = "examples/assets/go2/scene_geom.xml"
     model = load_model(path)
